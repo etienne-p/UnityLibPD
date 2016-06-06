@@ -1,0 +1,8 @@
+# OSX generated
+*.DS_Store
+# XCode generated
+/build
+# ndk generated
+/obj
+# cLion
+.idea/

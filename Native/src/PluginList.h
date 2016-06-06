@@ -1,0 +1,1 @@
+DECLARE_EFFECT("Demo LibPD", LibPD)
