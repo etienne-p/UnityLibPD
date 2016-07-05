@@ -117,6 +117,12 @@ public class LibPD : MonoBehaviour
 
 	void Start()
 	{
+		StartCoroutine (DoStart());
+	}
+
+	IEnumerator DoStart()
+	{
+		yield return new WaitForSeconds (1.0f);
 		// set the Pd instance index the audio effect is suposed to pull audio from
 		// we expect the audioMixer to be set and expose this parameter
 		GetComponent<AudioSource>().outputAudioMixerGroup.audioMixer.SetFloat ("pdIndex", pdIndex);
