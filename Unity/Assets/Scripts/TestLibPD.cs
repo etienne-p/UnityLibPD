@@ -32,6 +32,7 @@ public class TestLibPD : MonoBehaviour
 				patchOpened = true;
 				libPd.OpenPatch (patch, id => patchId = id);
 				libPd.LoadClip ("sample0", clip, "sample_length");
+				libPd.Subscribe("frequency");
 			}
 		} 
 		else if (patchId != -1 && GUI.Button (new Rect (x, y, btnWidth, btnHeight), "Close patch")) 
@@ -45,5 +46,6 @@ public class TestLibPD : MonoBehaviour
 		y += margin;
 		pitch = GUI.HorizontalSlider (new Rect(x, y, btnWidth, btnHeight), pitch, .0f, 1.0f);
 		libPd.SendFloat ("pitch", pitch);
+		Debug.Log("STREAM OF FLOATS: " + LibPD.receivedFloatValue);
 	}
 }

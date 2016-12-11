@@ -95,7 +95,7 @@ public class LibPD : MonoBehaviour
 			Marshal.GetFunctionPointerForDelegate( floatCallback );
 		LibPD_SetFloatFunction( intptr_delegateFloat );
 
-		symbolCallback = new ReceiveSymbolDelegate( symbolCallback );
+		symbolCallback = new ReceiveSymbolDelegate( ReceivedSymbol );
 		IntPtr intptr_delegateSymbol = 
 			Marshal.GetFunctionPointerForDelegate( symbolCallback);
 		LibPD_SetSymbolFunction( intptr_delegateSymbol );
@@ -142,6 +142,14 @@ public class LibPD : MonoBehaviour
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool LibPD_SendFloat (int id, 
 		[MarshalAs (UnmanagedType.LPStr)] string dest, float num);
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool LibPD_Subscribe (int id, 
+	    [MarshalAs (UnmanagedType.LPStr)] string source);
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool LibPD_Unsubscribe (int id,
+		[MarshalAs (UnmanagedType.LPStr)] string source);
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool LibPD_SendSymbol (int id, 
@@ -272,7 +280,7 @@ public class LibPD : MonoBehaviour
 		Debug.Log("PD subscribed to: " + source + " " + LibPD_Subscribe(pdIndex, source));
 	}
 
-	pubic void Unsubscribe(string source)
+	public void Unsubscribe(string source)
 	{
 		Debug.Log("PD unsubscribed from: " + source + " " + LibPD_Unsubscribe(pdIndex, source));
 	}

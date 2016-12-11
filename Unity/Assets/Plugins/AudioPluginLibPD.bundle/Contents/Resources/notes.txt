@@ -1,12 +1,9 @@
-pd -schedlib `pwd`/pdsched
+---------------- dolist --------------------
 
-dolist:
-pd~ to delay starting subproc until asked
-figure out about setting nchannels from command line
-fix maximum nchannels in and out
+GUIs: slider, etc "clip (pre-0.46) " (on for old ones, off by default)
+toggle to get "track value (pre-0.46)"
 
-
-
+x_text.c:
 text dimension setting (message or creation arg - how to do it in structs?)
 copying ala text_define_topointer
 "open" and "save as" messages to open text window
