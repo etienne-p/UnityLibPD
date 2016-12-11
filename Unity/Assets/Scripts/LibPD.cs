@@ -11,7 +11,7 @@ public class LibPD : MonoBehaviour
 	/*
 	Dummy static variables to be used when receiving messages from Pure Data. Add custom variables here
 	*/
-	public static float receivedFloatValue = 0.0f
+	public static float receivedFloatValue = 0.0f;
 	public static string receivedString = "";
 	
 
@@ -93,7 +93,7 @@ public class LibPD : MonoBehaviour
 		floatCallback = new ReceiveFloatDelegate( ReceivedFloat );
 		IntPtr intptr_delegateFloat = 
 			Marshal.GetFunctionPointerForDelegate( floatCallback );
-		LibPD_SetFloatFunction( intptr_delgateFloat );
+		LibPD_SetFloatFunction( intptr_delegateFloat );
 
 		symbolCallback = new ReceiveSymbolDelegate( symbolCallback );
 		IntPtr intptr_delegateSymbol = 
@@ -265,6 +265,16 @@ public class LibPD : MonoBehaviour
 	public void SendFloat(string dest, float val)
 	{
 		Debug.Log("Pd send float: " + LibPD_SendFloat (pdIndex, dest, val));
+	}
+
+	public void Subscribe(string source)
+	{
+		Debug.Log("PD subscribed to: " + source + " " + LibPD_Subscribe(pdIndex, source));
+	}
+
+	pubic void Unsubscribe(string source)
+	{
+		Debug.Log("PD unsubscribed from: " + source + " " + LibPD_Unsubscribe(pdIndex, source));
 	}
 
 	public void OnDestroy()
