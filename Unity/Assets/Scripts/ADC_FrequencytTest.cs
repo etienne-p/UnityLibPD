@@ -13,7 +13,7 @@ using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(LibPD))]
-public class TestLibPD : MonoBehaviour 
+public class ADCFreqTest : MonoBehaviour 
 {
 	public string patch;
 	public AudioClip clip;
