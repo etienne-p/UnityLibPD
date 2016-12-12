@@ -13,10 +13,9 @@ using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(LibPD))]
-public class ADCFreqTest : MonoBehaviour 
+public class ADC_FrequencyTest : MonoBehaviour 
 {
 	public string patch;
-	public AudioClip clip;
 
 	int 	patchId 	= -1;
 	float 	inputGain 	= .5f;
