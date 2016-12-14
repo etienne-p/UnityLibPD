@@ -66,6 +66,11 @@ namespace LibPD
         return false;
     }
     
+    
+    /*
+     ------------------------------------------------------------------------------------------------------------
+     Functions to be called from the binding in the client code, in this case C# for Unity.
+    */
     extern "C" bool LibPD_Create(const int id)
     {
         if (getContext(id) != nullptr) return false; // context already exists
@@ -154,6 +159,22 @@ namespace LibPD
         auto context = getContext(id);
         if (context == nullptr) return false;
         context->sendNoteOn(channel, pitch);
+        return true;
+    }
+    
+    extern "C" bool LibPD_Subscribe(const int id, const char* source)
+    {
+        auto context = getContext(id);
+        if (context == nullptr) return false;
+        context->subscribe(source);
+        return true;
+    }
+    
+    extern "C" bool LibPD_Unsubscribe(const int id, const char* source)
+    {
+        auto context = getContext(id);
+        if(context == nullptr) return false;
+        context->unsubscribe(source);
         return true;
     }
     

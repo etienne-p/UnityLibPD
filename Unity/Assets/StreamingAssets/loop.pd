@@ -1,28 +1,37 @@
 #N canvas 189 85 1000 627 10;
-#X obj 195 -309 tabread4~ sample0;
-#X obj 192 -256 dac~;
-#X text 183 -220 super simple looping;
+#X obj 220 -372 tabread4~ sample0;
+#X obj 220 -336 dac~;
+#X text 111 -618 super simple looping;
 #N canvas 0 22 450 278 (subpatch) 0;
 #X array sample0 199 float 2;
 #X coords 0 1 199 -1 200 140 1 0 0;
 #X restore 356 -607 graph;
-#X floatatom 195 -497 5 0 0 0 - - -, f 5;
-#X msg 252 -463 resize \$1;
-#X obj 252 -437 s sample0;
+#X floatatom 195 -497 5 0 0 0 - - -;
+#X msg 252 -481 resize \$1;
+#X obj 252 -455 s sample0;
 #X obj 430 -375 s sample_length;
-#X floatatom 430 -402 5 0 0 0 - - -, f 5;
-#X obj 432 -431 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+#X floatatom 430 -402 5 0 0 0 - - -;
+#X obj 430 -431 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X text 479 -433 for testing purpose;
-#X obj 211 -391 *~;
-#X obj 220 -356 +~ 1;
+#X obj 180 -440 *~;
+#X obj 220 -423 +~ 1;
 #X obj 195 -523 r sample_length;
-#X floatatom 112 -541 5 0 0 0 - - -, f 5;
+#X floatatom 117 -542 5 0 0 0 - - -;
 #X obj 117 -573 r pitch;
-#X obj 116 -449 phasor~ 1;
-#X obj 134 -494 sig~;
+#X obj 117 -457 phasor~ 1;
+#X obj 117 -502 sig~;
+#X obj 117 -258 s frequency;
+#X obj 117 -355 sigmund~;
+#X obj 117 -301 mtof;
+#X text 167 -573 Receive speed factor;
+#X text 71 -378 Frequency Analysis;
+#X text 149 -302 MIDI to Frequency;
+#X text 193 -257 Send to Unity \, use libPd.Subscribe("frequency")
+\;;
 #X connect 0 0 1 1;
 #X connect 0 0 1 0;
+#X connect 0 0 19 0;
 #X connect 4 0 5 0;
 #X connect 4 0 11 1;
 #X connect 5 0 6 0;
@@ -35,3 +44,5 @@
 #X connect 15 0 14 0;
 #X connect 16 0 11 0;
 #X connect 17 0 16 0;
+#X connect 19 0 20 0;
+#X connect 20 0 18 0;

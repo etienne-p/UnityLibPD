@@ -7,33 +7,113 @@ using System.Runtime.InteropServices;
 [RequireComponent(typeof(AudioSource))]
 public class LibPD : MonoBehaviour
 {
-	// DEBUG related stuff
 
+	/*
+	Dummy static variables to be used when receiving messages from Pure Data. Add custom variables here
+	*/
+	public static float receivedFloatValue = 0.0f;
+	public static string receivedString = "";
+	
+
+	// DEBUG related stuff
 	const string PLUGIN_NAME = "AudioPluginLibPD";
 
+	/*
+	Pointer to callback functions to receive the messages, prints, floats, etc, from Pure Data
+	*/
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	private delegate void DebugLogDelegate(string str);
 
-	private static DebugLogDelegate debugLogCallback;
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	private delegate void ReceiveBangDelegate(string source);
 
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	private delegate void ReceiveFloatDelegate(string source, float num);
+
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	private delegate void ReceiveSymbolDelegate(string source, string symbol);
+
+	/*
+	Instances to the pointers to the callback functions 
+	*/
+	private static DebugLogDelegate 		debugLogCallback;
+	private static ReceiveBangDelegate 		bangCallback;
+	private static ReceiveFloatDelegate 	floatCallback;
+	private static ReceiveSymbolDelegate 	symbolCallback;
+
+	/*
+	Actual Functions to be called when an event is raised and sometehing is received with a tag
+	to which this client has previously subscribed. The function to be called depends on the type of recived data.
+	Insert custom code in these functions
+	*/
 	private static void DebugLog(string str)
 	{
+		// Called when a Print is sent
 		Debug.Log("[NATIVE LIBPD]" + str);
 	}
 
-	private static void SetPrintCallback()
+	private static void ReceivedBang(string source)
 	{
+		// Called when a Bang is received
+		Debug.Log("[NATIVE LIBPD BANG] " + "from " + source );
+	}
+
+	private static void ReceivedFloat(string source, float num)
+	{
+		// Called when a Float is received
+		Debug.Log("[NATIVE LIBPD FLOAT] " + "from " + source + " and value: " + num);
+		receivedFloatValue = num;
+	}
+
+	private static void ReceivedSymbol(string source, string symbol)
+	{
+		// Called when a symbol is received
+		Debug.Log("[NATIVE LIBPD SYMBOL] " + "from " + source + " and symbol: " + symbol);
+	}
+
+
+	/*
+	Initialise all Callbacks, pass the poiner of functions to the hooks in LibPD through the methods 
+	defined in UnityPdReceiver.cpp
+	*/
+	private static void SetAllCallbacks()
+	{
+		// callback_delegate are converted into a function pointer that can be used in unmanaged code.
+		
 		debugLogCallback = new DebugLogDelegate( DebugLog );
-		// Convert callback_delegate into a function pointer that can be used in unmanaged code.
-		IntPtr intptr_delegate = 
+		IntPtr intptr_delegatePrint = 
 			Marshal.GetFunctionPointerForDelegate(debugLogCallback);
-		LibPD_SetDebugFunction( intptr_delegate );
+		LibPD_SetDebugFunction( intptr_delegatePrint );
+
+		bangCallback = new ReceiveBangDelegate ( ReceivedBang );
+		IntPtr intptr_delegateBang = 
+			Marshal.GetFunctionPointerForDelegate (bangCallback);
+		LibPD_SetBangFunction( intptr_delegateBang );
+
+		floatCallback = new ReceiveFloatDelegate( ReceivedFloat );
+		IntPtr intptr_delegateFloat = 
+			Marshal.GetFunctionPointerForDelegate( floatCallback );
+		LibPD_SetFloatFunction( intptr_delegateFloat );
+
+		symbolCallback = new ReceiveSymbolDelegate( ReceivedSymbol );
+		IntPtr intptr_delegateSymbol = 
+			Marshal.GetFunctionPointerForDelegate( symbolCallback);
+		LibPD_SetSymbolFunction( intptr_delegateSymbol );
 	}
 
 	// PD Bindings
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern void LibPD_SetDebugFunction( IntPtr fp );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern void LibPD_SetBangFunction( IntPtr fp);
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern void LibPD_SetFloatFunction( IntPtr fp );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern void LibPD_SetSymbolFunction( IntPtr fp);
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool LibPD_Create (int id);
@@ -62,6 +142,14 @@ public class LibPD : MonoBehaviour
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool LibPD_SendFloat (int id, 
 		[MarshalAs (UnmanagedType.LPStr)] string dest, float num);
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool LibPD_Subscribe (int id, 
+	    [MarshalAs (UnmanagedType.LPStr)] string source);
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool LibPD_Unsubscribe (int id,
+		[MarshalAs (UnmanagedType.LPStr)] string source);
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool LibPD_SendSymbol (int id, 
@@ -120,7 +208,7 @@ public class LibPD : MonoBehaviour
 		// set the Pd instance index the audio effect is suposed to pull audio from
 		// we expect the audioMixer to be set and expose this parameter
 		GetComponent<AudioSource>().outputAudioMixerGroup.audioMixer.SetFloat ("pdIndex", pdIndex);
-		SetPrintCallback ();
+		SetAllCallbacks ();
 		OnEnable();
 		sampleRate = AudioSettings.outputSampleRate;
 		thread = new Thread(InitPd);
@@ -185,6 +273,16 @@ public class LibPD : MonoBehaviour
 	public void SendFloat(string dest, float val)
 	{
 		Debug.Log("Pd send float: " + LibPD_SendFloat (pdIndex, dest, val));
+	}
+
+	public void Subscribe(string source)
+	{
+		Debug.Log("PD subscribed to: " + source + " " + LibPD_Subscribe(pdIndex, source));
+	}
+
+	public void Unsubscribe(string source)
+	{
+		Debug.Log("PD unsubscribed from: " + source + " " + LibPD_Unsubscribe(pdIndex, source));
 	}
 
 	public void OnDestroy()

@@ -1,4 +1,4 @@
-//
+///
 //  UnityPdReceiver.h
 //  AudioPluginLibPD
 //
@@ -19,6 +19,9 @@ public:
     std::queue<std::string> logs;
     
     // pd message receiver callbacks
-    void print(const std::string& message);
+    void print          (const std::string& message);
+    void receiveBang    (const std::string& source);
+    void receiveFloat   (const std::string& source, float num);
+    void receiveSymbol  (const std::string& source, const std::string& symbol);
 };
 
